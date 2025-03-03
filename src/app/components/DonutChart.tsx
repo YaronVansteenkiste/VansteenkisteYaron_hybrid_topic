@@ -23,7 +23,7 @@ export default function DonutChart() {
 
         const pie = d3.pie<{ framework: string; value: number }>().value(d => d.value);
         const arc = d3.arc<d3.PieArcDatum<{ framework: string; value: number }>>()
-            .innerRadius(0)
+            .innerRadius(radius * 0.5)
             .outerRadius(radius);
 
         const g = svg.append("g")
@@ -51,6 +51,8 @@ export default function DonutChart() {
         arcs.append("path")
             .attr("d", arc)
             .attr("fill", (d, i) => color(i.toString()));
+
+
 
 
     }, []);
