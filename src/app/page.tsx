@@ -1,58 +1,70 @@
-// gebruikte bronnen:
-// https://d3js.org/getting-started
-// https://www.youtube.com/watch?v=C4t6qfHZ6Tw
 'use client';
 import * as d3 from "d3";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
+  const chartRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const data = [
-      {"platform": "Android", "percentage": 40.11},
-      {"platform": "Windows", "percentage": 36.69},
-      {"platform": "iOS", "percentage": 13.06}
+    if (!chartRef.current) return;
+
+    interface DataPoint {
+      date: Date;
+      value: number;
+    }
+
+    const data: DataPoint[] = [
+      { date: new Date(2023, 0, 1), value: 30 },
+      { date: new Date(2023, 1, 1), value: 50 },
+      { date: new Date(2023, 2, 1), value: 80 },
+      { date: new Date(2023, 3, 1), value: 65 },
+      { date: new Date(2023, 4, 1), value: 95 },
     ];
 
-    const svgWidth = 500;
-    const svgHeight = 300;
-    const radius = Math.min(svgWidth, svgHeight) / 2;
+    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = 800 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
 
-    const svg = d3.select('svg')
-      .attr('width', svgWidth)
-      .attr('height', svgHeight);
+    d3.select(chartRef.current).select("svg").remove();
 
-    const g = svg.append('g')
-      .attr('transform', `translate(${radius}, ${radius})`);
+    const svg = d3.select(chartRef.current)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const x = d3.scaleTime()
+      .domain(d3.extent(data, d => d.date) as [Date, Date])
+      .range([0, width]);
 
-    const pie = d3.pie<{ platform: string; percentage: number }>().value(d => d.percentage);
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.value) ?? 0])
+      .range([height, 0]);
 
-    const path = d3.arc()
-      .outerRadius(radius)
-      .innerRadius(0);
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
 
-    const arc = g.selectAll().data(pie(data)).enter(); 
+    svg.append("g")
+      .call(d3.axisLeft(y));
 
-    arc.append('path')
-      .attr('d', d => path(d as any))
-      .attr('fill', d => color(d.data.platform));
+    const line = d3.line<DataPoint>()
+      .x(d => x(d.date)!)
+      .y(d => y(d.value)!);
 
-    const label = d3.arc()
-      .outerRadius(radius)
-      .innerRadius(0);
-
-    arc.append('text')
-      .attr('transform', d => `translate(${label.centroid(d as any)})`)
-      .text(d => d.data.platform)
-      .style('text-anchor', 'middle');
-  
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", line);
   }, []);
 
   return (
     <div>
-      <h1>D3js demo</h1>
-      <svg className="bg-dark"></svg>
+      <h1>D3.js Demo</h1>
+      <div ref={chartRef}></div>
     </div>
   );
 }
