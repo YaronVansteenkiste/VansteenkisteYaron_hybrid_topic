@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    const dataset = [80, 100, 56, 120, 180, 30, 40, 120, 160];
+    const dataset = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const svgWidth = 500;
     const svgHeight = 300;
@@ -19,12 +19,16 @@ export default function Home() {
       .attr('width', svgWidth)
       .attr('height', svgHeight);
 
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(dataset) ?? 0])
+      .range([0, svgHeight]);
+
     const barChart = svg.selectAll('rect')
       .data(dataset)
       .enter()
       .append('rect')
-      .attr('y', d => svgHeight - d)
-      .attr('height', d => d)
+      .attr('y', d => svgHeight - yScale(d))
+      .attr('height', d => yScale(d))
       .attr('fill', 'lightblue')
       .attr('width', barWidth - barPadding)
       .attr('transform', (d, i) => {
