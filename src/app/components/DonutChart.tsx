@@ -19,6 +19,7 @@ export default function DonutChart() {
         const width = 500;
         const height = 500;
         const radius = Math.min(width, height) / 3;
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
 
 
         const pie = d3.pie<{ framework: string; value: number }>().value(d => d.value);
@@ -35,25 +36,28 @@ export default function DonutChart() {
             .append("g")
             .attr("class", "arc");
 
-        arcs.append("path")
+            arcs.append("path")
             .attr("d", arc)
-            .attr("fill", "steelblue");
+            .attr("fill", (d, i) => color(i.toString()))
+            .on("mouseover", function (event, d) {
+              d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("transform", "scale(1.1)");
+            })
+            .on("mouseout", function (event, d) {
+              d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("transform", "scale(1)");
+            });
 
         arcs.append("text")
             .attr("transform", d => `translate(${arc.centroid(d)})`)
             .attr("text-anchor", "middle")
             .attr("font-size", "12px")
-            .attr("fill", "white")
+            .attr("fill", "black") 
             .text(d => d.data.framework);
-
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-        arcs.append("path")
-            .attr("d", arc)
-            .attr("fill", (d, i) => color(i.toString()));
-
-
-
 
     }, []);
 
