@@ -25,13 +25,24 @@ export default function Home() {
       .append('rect')
       .attr('y', d => svgHeight - d)
       .attr('height', d => d)
-      .attr('fill', 'lightblue') 
+      .attr('fill', 'lightblue')
       .attr('width', barWidth - barPadding)
       .attr('transform', (d, i) => {
         const translate = [barWidth * i, 0];
         return `translate(${translate})`;
       }
       );
+
+
+    const text = svg.selectAll('text')
+      .data(dataset)
+      .enter()
+      .append('text')
+      .text(d => d)
+      .attr('y', (d, i) => svgHeight - d - 2)
+      .attr('x', (d, i) => barWidth * i)
+      .attr('fill', '#A64C38');
+
   }, []);
 
   return (
