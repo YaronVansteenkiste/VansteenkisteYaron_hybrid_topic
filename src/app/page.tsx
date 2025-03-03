@@ -7,16 +7,14 @@ import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    d3.select("h1").style("color", "red")
-      .attr('class', 'heading')
-      .text('Updated h1 tag');
+    const dataset = [1, 2, 3, 4, 5];
 
-
-    d3.select('body').append('p').text('First paragraph');
-    d3.select('body').append('p').text('Second paragraph');
-    d3.select('body').append('p').text('Third paragraph');
-
-    d3.selectAll('p').style('color', 'blue');
+    d3.select("body")
+      .selectAll("p")
+      .data(dataset)
+      .enter()
+      .append("p")
+      .text(function(d) {return d;})
   }, []);
 
   return (
