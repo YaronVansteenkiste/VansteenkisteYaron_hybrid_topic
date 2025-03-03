@@ -20,6 +20,7 @@ export default function DonutChart() {
         const height = 500;
         const radius = Math.min(width, height) / 3;
 
+
         const pie = d3.pie<{ framework: string; value: number }>().value(d => d.value);
         const arc = d3.arc<d3.PieArcDatum<{ framework: string; value: number }>>()
             .innerRadius(0)
@@ -38,13 +39,19 @@ export default function DonutChart() {
             .attr("d", arc)
             .attr("fill", "steelblue");
 
-
         arcs.append("text")
             .attr("transform", d => `translate(${arc.centroid(d)})`)
             .attr("text-anchor", "middle")
             .attr("font-size", "12px")
             .attr("fill", "white")
             .text(d => d.data.framework);
+
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        arcs.append("path")
+            .attr("d", arc)
+            .attr("fill", (d, i) => color(i.toString()));
+
 
     }, []);
 
